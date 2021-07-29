@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function getData() {
+            $.ajax({
+                type: "GET",
+                //tên API
+                url: "https://api-kent.netlify.app/.netlify/functions/api?fbclid=IwAR3sTnE9tG8i4bE-DkyUoQ5wer2uNxEkas9n3sKzjvip53wftlCTnOulOOQ",
+                //xử lý khi thành công
+                success: function (data) {
+                    let str = "        <tr>\n" +
+                        "            <td>Tỉnh</td>\n" +
+                        "            <td>Số Ca</td>\n" +
+                        "            <td>Phục hồi</td>\n" +
+                        "            <td>Tử vong</td>\n" +
+                        "        </tr>";
+                    for (let i = 0; i < 62; i++) {
+                        str += "<tr><td>" + data.detail[i].name;
+                        str += "</td><td>" + data.detail[i].cases;
+                        str += "</td><td>" + data.detail[i].recovered;
+                        str += "</td><td>" + data.detail[i].deaths;
+                        str += "</td>"
+                    }
+                    document.getElementById("show").innerHTML = str
+                    console.log(data)
+                }
+            });
+        }
+        function getData2() {
+            $.ajax({
+                type: "GET",
+
+                url: "http://localhost:8080/cities/api",
+
+                success: function (data) {
+                    let str = "    <tr>\n" +
+                        "        <td>Name</td>\n" +
+                        "        <td>Country</td>\n" +
+                        "    </tr>"
+                    for (let i=0; i<data.length; i++) {
+                        str+="<tr><td>"+data[i].name+"</td>"+"<td>"+data[i].country.name+"</td></tr>"
+                    }
+                    console.log(data.length)
+                    document.getElementById("show").innerHTML = str;
+                }, error: function () {
+                    alert("Lỗi server")
+                }
+            });
+            setTimeout(getData2, 2000);
+        }
+        function add() {
+            let name = document.getElementById("name").value;
+            let city = {
+                "name": name,
+                "country": {
+                    "id": 1
+                }
+            }
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "http://localhost:8080/api/cities",
+                data: JSON.stringify(city),
+                success: function (data) {
+                    getData2();
+                },
+                error: function () {
+                }
+            });
+        }
+    </script>
+</head>
+
+<body onload="getData2()">
+<h1>Top</h1>
+<input type="text" id="name">
+<button onclick="add()">Add Country</button>
+<table id="show" border="1" style="border-collapse: collapse">
+
+</table>
+<h2>Footer</h2>
+</body>
+</html>

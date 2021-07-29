@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        function load() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/cities",
+                success: function (listCity) {
+                    let str = "";
+                    for (let i = 0; i < listCity.length; i++) {
+                        str += "<h1><a onclick='viewDetail(" + listCity[i].id + ")'>" + listCity[i].name + "</a></h1>";
+                    }
+                    document.getElementById("main").innerHTML = str;
+                }
+            });
+        }
+
+        function viewDetail(id) {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/cities/" + id,
+                success: function (city) {
+                    let str = "Tên: " + city.name + ", quốc gia: " + city.country.name;
+                    document.getElementById("main").innerHTML = str;
+                }
+            });
+        }
+
+        function showFormCreate() {
+            document.getElementById("sub-main").innerHTML = '<input type="text" id="name"> <button onclick="save()">Create</button>'
+        }
+
+        function save() {
+            let name = document.getElementById("name").value;
+            let city = {
+                "name": name,
+                "country": {
+                    "id": 1
+                }
+            }
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "http://localhost:8080/api/cities",
+                data: JSON.stringify(city),
+                success: load,
+                error: function (error) {
+
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="load()">
+<div>Top</div>
+<div>
+    <button onclick="showFormCreate()">Create</button>
+</div>
+<div id="main">
+    Main
+</div>
+<div id="sub-main">
+    Sub-Main
+</div>
+<div>Footer</div>
+</body>
+</html>
