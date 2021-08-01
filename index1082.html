@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+
+        function loadData() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/posts",
+                success: function (data) {
+                    console.log(data)
+                    let str = "";
+                    for (let i = 0; i < data.length; i++) {
+                        str += "<br><span>" + data[i].title + ": " + data[i].content + ": " + data[i].user.fullName
+                            + "<button onclick='showFormEdit(" + data[i].id + ")'>edit</button></span>"
+                            + "<button onclick='deleteById(" + data[i].id + ")'>delete</button></span>";
+                    }
+                    document.getElementById("content").innerHTML = str;
+                }
+            })
+        }
+
+        function showFormCreate() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/users",
+                success: function (data) {
+                    console.log(data)
+                    let str = '<input type="text" placeholder="title" id="title">\n' +
+                        '    <input type="text" placeholder="content" id="content">\n'+
+                        '<select id="user">\n'
+
+                    for (let i = 0; i < data.length; i++) {
+                        str+='<option value="'+data[i].id+'">'+data[i].fullName+'</option>'
+                    }
+                    str+=' </select><button onclick="save()">Save</button>';
+                    document.getElementById("form").innerHTML = str;
+                }
+            })
+        }
+
+        function save() {
+            let post = {
+                title: document.getElementById("title").value,
+                content: document.getElementById("content").value,
+                user: {
+                    id: document.getElementById("user").value,
+                }
+            }
+            console.log(post)
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "http://localhost:8080/posts",
+                data: JSON.stringify(post),
+                success: loadData,
+                error: function (error) {
+
+                }
+            });
+            document.getElementById("form").innerHTML = '    <button onclick="showFormCreate()">Add</button>\n' +
+                '    <button onclick="showFormSearch()">Search</button>'
+        }
+    </script>
+</head>
+<body onload="loadData()">
+<div id="form">
+    <button onclick="showFormCreate()">Add</button>
+    <button onclick="showFormSearch()">Search</button>
+</div>
+<div id="content">
+</div>
+</body>
+</html>

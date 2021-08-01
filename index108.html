@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+
+        function loadData() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/users",
+                success: function (data) {
+                    console.log(data)
+                    let str = "";
+                    for (let i = 0; i < data.length; i++) {
+                        str += "<br><span>" + data[i].username + ": " + data[i].fullName
+                            + "<button onclick='showFormEdit(" + data[i].id + ")'>edit</button></span>"
+                            + "<button onclick='deleteById(" + data[i].id + ")'>delete</button></span>";
+                    }
+                    document.getElementById("content").innerHTML = str;
+                }
+            })
+        }
+
+        function showFormCreate() {
+            document.getElementById("form").innerHTML = '<input type="text" placeholder="username" id="username">\n' +
+                '    <input type="password" placeholder="password" id="password">\n' +
+                '    <input type="text" placeholder="full name" id="name">\n' +
+                '    <button onclick="save()">Save</button>'
+        }
+
+        function save() {
+            let user = {
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+                fullName: document.getElementById("name").value,
+            }
+            console.log(user)
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "http://localhost:8080/users",
+                data: JSON.stringify(user),
+                success: loadData,
+                error: function (error) {
+
+                }
+            });
+            document.getElementById("form").innerHTML = '    <button onclick="showFormCreate()">Add</button>\n' +
+                '    <button onclick="showFormSearch()">Search</button>'
+        }
+
+        function showFormEdit(id) {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/users/" + id,
+                success: function (data) {
+                    document.getElementById("form").innerHTML = '<input type="text" placeholder="username" id="username" value="' + data.username + '">\n' +
+                        '    <input type="password" placeholder="password" id="password" value="' + data.password + '">\n' +
+                        '    <input type="text" placeholder="full name" id="name" value="' + data.fullName + '">\n' +
+                        '    <button onclick="saveEdit(' + data.id + ')">Save</button>'
+                }
+            })
+        }
+
+        function saveEdit(id) {
+            let user = {
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value,
+                fullName: document.getElementById("name").value,
+            }
+            console.log(user)
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "PUT",
+                url: "http://localhost:8080/users/" + id,
+                data: JSON.stringify(user),
+                success: loadData,
+                error: function (error) {
+                }
+            });
+            document.getElementById("form").innerHTML = '    <button onclick="showFormCreate()">Add</button>\n' +
+                '    <button onclick="showFormSearch()">Search</button>'
+        }
+
+        function deleteById(id) {
+            if (confirm("Bạn có thật sự muốn xoá?")) {
+                $.ajax({
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    type: "DELETE",
+                    url: "http://localhost:8080/users/" + id,
+                    success: loadData,
+                    error: function (error) {
+                    }
+                });
+            }
+        }
+
+        function showFormSearch() {
+            document.getElementById("form").innerHTML = '<input type="text" id="key"><button onclick="search()">Search</button>'
+        }
+
+        function search() {
+            let key = document.getElementById("key").value;
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/users/search?name="+key,
+                success: function (data) {
+                    let str = "";
+                    for (let i = 0; i < data.length; i++) {
+                        str += "<br><span>" + data[i].username + ": " + data[i].fullName
+                            + "<button onclick='showFormEdit(" + data[i].id + ")'>edit</button></span>"
+                            + "<button onclick='deleteById(" + data[i].id + ")'>delete</button></span>";
+                    }
+
+                    document.getElementById("content").innerHTML = str;
+                }
+            })
+            document.getElementById("form").innerHTML = '    <button onclick="showFormCreate()">Add</button>\n' +
+                '    <button onclick="showFormSearch()">Search</button>'
+        }
+    </script>
+</head>
+<body onload="loadData()">
+
+<div id="form">
+    <button onclick="showFormCreate()">Add</button>
+    <button onclick="showFormSearch()">Search</button>
+</div>
+<div id="content">
+
+</div>
+</body>
+</html>
