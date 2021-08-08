@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+            crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        function login() {
+            let user = {
+                username: document.getElementById('un').value,
+                password: document.getElementById('pw').value,
+            }
+            if (user.username == "") {
+                document.getElementById('bug-un').innerHTML = "Lỗi rồi dmm";
+            } else {
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "http://localhost:8080/login",
+                    data: JSON.stringify(user),
+                    success: function (pa) {
+                        if (pa.roles.length < 2) {
+                            window.location.href = "trangchu.html"
+                        } else {
+                            window.location.href = "admin.html"
+                        }
+                    },
+                    error: function (e) {
+
+                    }
+                })
+            }
+        }
+    </script>
+</head>
+<body>
+<input type="text" id="un"><div id="bug-un"></div>
+<input type="text" id="pw">
+<button onclick="login()">Login</button>
+</body>
+</html>
